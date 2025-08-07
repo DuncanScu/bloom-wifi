@@ -71,21 +71,45 @@ export function compareDates(date1: string, date2: string): boolean {
 export async function parseWiFiPasswordsCSV(
   filePath?: string
 ): Promise<CSVParseResult> {
-  const csvPath = filePath || path.join(process.cwd(), "wifi-passwords.csv");
+  // Try multiple possible paths for the CSV file
+  const possiblePaths = [
+    filePath,
+    path.join(process.cwd(), "public", "wifi-passwords.csv"),
+    path.join(process.cwd(), "wifi-passwords.csv"),
+    path.join(__dirname, "..", "..", "public", "wifi-passwords.csv"),
+    "./public/wifi-passwords.csv",
+  ].filter(Boolean) as string[];
+
+  let csvPath: string | null = null;
+
+  // Find the first existing path
+  for (const testPath of possiblePaths) {
+    try {
+      if (fs.existsSync(testPath)) {
+        csvPath = testPath;
+        break;
+      }
+    } catch (e) {
+      // Continue to next path
+      console.warn(`Could not check path ${testPath}:`, e);
+    }
+  }
+
+  if (!csvPath) {
+    console.error("CSV file not found in any of these paths:", possiblePaths);
+    return {
+      entries: [],
+      error: {
+        state: "file-not-found",
+        message:
+          "Unable to load password file. Please contact staff for assistance.",
+      },
+    };
+  }
+
+  console.log("Using CSV file at:", csvPath);
 
   try {
-    // Check if file exists
-    if (!fs.existsSync(csvPath)) {
-      return {
-        entries: [],
-        error: {
-          state: "file-not-found",
-          message:
-            "Unable to load password file. Please contact staff for assistance.",
-        },
-      };
-    }
-
     // Check cache validity
     const stats = fs.statSync(csvPath);
     const lastModified = stats.mtime.getTime();
