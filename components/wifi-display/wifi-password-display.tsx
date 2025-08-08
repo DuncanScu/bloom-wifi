@@ -78,10 +78,14 @@ export function WiFiPasswordDisplay({
   };
 
   const getCurrentDate = () => {
+    // Use the same timezone as the server - adjust this to match your location
+    const timezone = "Europe/London"; // Change this to your timezone
+
     return new Date().toLocaleDateString("en-GB", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
+      timeZone: timezone,
     });
   };
 

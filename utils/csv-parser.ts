@@ -272,11 +272,21 @@ export function findPasswordForDate(
 }
 
 /**
- * Gets the current date formatted as DD/MM/YYYY
- * @returns Current date in DD/MM/YYYY format
+ * Gets the current date formatted as DD/MM/YYYY in a specific timezone
+ * @param timezone - IANA timezone string (e.g., 'Europe/London', 'America/New_York')
+ * @returns Current date in DD/MM/YYYY format for the specified timezone
  */
-export function getCurrentDateFormatted(): string {
-  return formatDateToDDMMYYYY(new Date());
+export function getCurrentDateFormatted(timezone?: string): string {
+  // Default to your local timezone - adjust this to match your location
+  const tz = timezone || "Europe/London"; // Change this to your timezone
+
+  const now = new Date();
+  const localDate = new Date(now.toLocaleString("en-US", { timeZone: tz }));
+
+  console.log(`Current date in ${tz}:`, localDate.toISOString());
+  console.log(`Server timezone date:`, now.toISOString());
+
+  return formatDateToDDMMYYYY(localDate);
 }
 
 /**
