@@ -6,10 +6,15 @@ import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Loading } from "@/components/ui/loading";
 import { getCurrentWiFiPassword } from "@/lib/actions/wifi-password-actions";
 
+// Force dynamic rendering and disable caching to ensure fresh password calculation on every request
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 /**
  * WiFi Password Page Component
  *
  * Server component that fetches the current WiFi password and displays it
+ * Recalculates on every page refresh
  */
 async function WiFiPasswordContent() {
   // Fetch the current WiFi password on the server
