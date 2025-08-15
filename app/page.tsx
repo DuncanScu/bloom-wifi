@@ -23,6 +23,7 @@ async function WiFiPasswordContent() {
   return (
     <WiFiPasswordDisplay
       currentPassword={passwordData.password}
+      yesterdayPassword={passwordData.yesterdayPassword}
       networkName={passwordData.networkName}
       error={passwordData.error}
     />

@@ -290,6 +290,26 @@ export function getCurrentDateFormatted(timezone?: string): string {
 }
 
 /**
+ * Gets yesterday's date formatted as DD/MM/YYYY in a specific timezone
+ * @param timezone - IANA timezone string (e.g., 'Europe/London', 'America/New_York')
+ * @returns Yesterday's date in DD/MM/YYYY format for the specified timezone
+ */
+export function getYesterdayDateFormatted(timezone?: string): string {
+  // Default to your local timezone - adjust this to match your location
+  const tz = timezone || "Europe/London"; // Change this to your timezone
+
+  const now = new Date();
+  const localDate = new Date(now.toLocaleString("en-US", { timeZone: tz }));
+
+  // Subtract one day
+  localDate.setDate(localDate.getDate() - 1);
+
+  console.log(`Yesterday's date in ${tz}:`, localDate.toISOString());
+
+  return formatDateToDDMMYYYY(localDate);
+}
+
+/**
  * Clears the CSV cache - useful for testing or when file changes are expected
  */
 export function clearCSVCache(): void {

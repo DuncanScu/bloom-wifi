@@ -21,14 +21,19 @@ import { WiFiQRCode } from "./wifi-qr-code";
  */
 export function WiFiPasswordDisplay({
   currentPassword,
+  yesterdayPassword,
   networkName,
   error,
 }: WiFiDisplayProps) {
-  const [copied, setCopied] = useState(false);
+  const [copiedToday, setCopiedToday] = useState(false);
+  const [copiedYesterday, setCopiedYesterday] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
 
-  const handleCopyPassword = async () => {
-    if (!currentPassword) return;
+  const handleCopyPassword = async (
+    password: string,
+    isToday: boolean = true
+  ) => {
+    if (!password) return;
 
     try {
       // Check if clipboard API is available
@@ -36,10 +41,15 @@ export function WiFiPasswordDisplay({
         throw new Error("Clipboard API not available");
       }
 
-      await navigator.clipboard.writeText(currentPassword);
-      setCopied(true);
+      await navigator.clipboard.writeText(password);
+      if (isToday) {
+        setCopiedToday(true);
+        setTimeout(() => setCopiedToday(false), 2000);
+      } else {
+        setCopiedYesterday(true);
+        setTimeout(() => setCopiedYesterday(false), 2000);
+      }
       setCopyError(null);
-      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy password:", err);
       setCopyError("Failed to copy password. Please copy manually.");
@@ -47,7 +57,7 @@ export function WiFiPasswordDisplay({
       // Try fallback method for older browsers
       try {
         const textArea = document.createElement("textarea");
-        textArea.value = currentPassword;
+        textArea.value = password;
         textArea.style.position = "fixed";
         textArea.style.left = "-999999px";
         textArea.style.top = "-999999px";
@@ -58,9 +68,14 @@ export function WiFiPasswordDisplay({
         // Use deprecated execCommand as fallback for older browsers
         const success = document.execCommand("copy");
         if (success) {
-          setCopied(true);
+          if (isToday) {
+            setCopiedToday(true);
+            setTimeout(() => setCopiedToday(false), 2000);
+          } else {
+            setCopiedYesterday(true);
+            setTimeout(() => setCopiedYesterday(false), 2000);
+          }
           setCopyError(null);
-          setTimeout(() => setCopied(false), 2000);
         }
 
         document.body.removeChild(textArea);
@@ -82,6 +97,21 @@ export function WiFiPasswordDisplay({
     const timezone = "Europe/London"; // Change this to your timezone
 
     return new Date().toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      timeZone: timezone,
+    });
+  };
+
+  const getYesterdayDate = () => {
+    // Use the same timezone as the server - adjust this to match your location
+    const timezone = "Europe/London"; // Change this to your timezone
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    return yesterday.toLocaleDateString("en-GB", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -182,25 +212,50 @@ export function WiFiPasswordDisplay({
               </p>
             </div>
 
-            {/* Copy Button next to password */}
-            <Button
-              onClick={handleCopyPassword}
-              variant="outline"
-              className="w-full py-2 sm:py-3 text-sm sm:text-base"
-              disabled={copied}
-            >
-              {copied ? (
-                <>
-                  <Check className="h-4 w-4 mr-2" />
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <Copy className="h-4 w-4 mr-2" />
-                  Copy Password
-                </>
+            {/* Copy Buttons */}
+            <div className="space-y-2">
+              {/* Today's Password Copy Button */}
+              <Button
+                onClick={() => handleCopyPassword(currentPassword, true)}
+                variant="outline"
+                className="w-full py-2 sm:py-3 text-sm sm:text-base"
+                disabled={copiedToday}
+              >
+                {copiedToday ? (
+                  <>
+                    <Check className="h-4 w-4 mr-2" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy Password
+                  </>
+                )}
+              </Button>
+
+              {/* Yesterday's Password Copy Button - only show if available */}
+              {yesterdayPassword && (
+                <Button
+                  onClick={() => handleCopyPassword(yesterdayPassword, false)}
+                  variant="outline"
+                  className="w-full py-2 sm:py-3 text-sm sm:text-base"
+                  disabled={copiedYesterday}
+                >
+                  {copiedYesterday ? (
+                    <>
+                      <Check className="h-4 w-4 mr-2" />
+                      Copied Yesterday's!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4 mr-2" />
+                      Copy Yesterday's Password
+                    </>
+                  )}
+                </Button>
               )}
-            </Button>
+            </div>
           </div>
 
           {/* QR Code Component */}

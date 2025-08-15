@@ -15,6 +15,8 @@ export interface PasswordEntry {
 export interface WiFiDisplayProps {
   /** The current password to display, null if not found */
   currentPassword: string | null;
+  /** Yesterday's password to display, null if not found */
+  yesterdayPassword: string | null;
   /** The network name to display */
   networkName: string;
   /** Optional error message to display */
@@ -58,6 +60,8 @@ export interface CSVParseResult {
 export interface PasswordLookupResult {
   /** The found password, null if not found */
   password: string | null;
+  /** Yesterday's password, null if not found */
+  yesterdayPassword: string | null;
   /** The network name */
   networkName: string;
   /** Any error that occurred during lookup */

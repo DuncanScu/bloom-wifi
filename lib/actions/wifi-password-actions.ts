@@ -1,6 +1,7 @@
 import {
   parseWiFiPasswordsCSV,
   getCurrentDateFormatted,
+  getYesterdayDateFormatted,
   findPasswordForDate,
 } from "@/utils/csv-parser";
 import { PasswordLookupResult } from "@/lib/types";
@@ -33,12 +34,18 @@ export async function getCurrentWiFiPassword(): Promise<PasswordLookupResult> {
       };
     }
 
-    // Get current date and find matching password
+    // Get current date and yesterday's date, then find matching passwords
     const currentDate = getCurrentDateFormatted();
+    const yesterdayDate = getYesterdayDateFormatted();
     console.log("Looking for password for date:", currentDate);
+    console.log("Looking for yesterday's password for date:", yesterdayDate);
     console.log("Available entries:", parseResult.entries.length);
 
     const password = findPasswordForDate(parseResult.entries, currentDate);
+    const yesterdayPassword = findPasswordForDate(
+      parseResult.entries,
+      yesterdayDate
+    );
 
     // If no password found for current date
     if (!password) {
@@ -49,20 +56,32 @@ export async function getCurrentWiFiPassword(): Promise<PasswordLookupResult> {
       );
       return {
         password: null,
+        yesterdayPassword,
         networkName,
         error: `No password available for today (${currentDate}). Please check with staff for the current password.`,
       };
     }
 
     console.log("Successfully found password for:", currentDate);
+    if (yesterdayPassword) {
+      console.log(
+        "Successfully found yesterday's password for:",
+        yesterdayDate
+      );
+    } else {
+      console.log("No password found for yesterday:", yesterdayDate);
+    }
+
     return {
       password,
+      yesterdayPassword,
       networkName,
     };
   } catch (error) {
     console.error("Unexpected error in getCurrentWiFiPassword:", error);
     return {
       password: null,
+      yesterdayPassword: null,
       networkName,
       error:
         "An unexpected error occurred while loading the password. Please contact staff for assistance.",
