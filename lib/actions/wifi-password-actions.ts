@@ -29,6 +29,7 @@ export async function getCurrentWiFiPassword(): Promise<PasswordLookupResult> {
       console.error("CSV parsing error:", parseResult.error);
       return {
         password: null,
+        yesterdayPassword: null,
         networkName,
         error: parseResult.error.message,
       };

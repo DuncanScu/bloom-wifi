@@ -59,6 +59,7 @@ export function WiFiPasswordWrapper({ initialData }: WiFiPasswordWrapperProps) {
   return (
     <WiFiPasswordDisplay
       currentPassword={data.password}
+      yesterdayPassword={data.yesterdayPassword}
       networkName={data.networkName}
       error={data.error}
     />

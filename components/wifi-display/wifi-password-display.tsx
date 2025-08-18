@@ -245,12 +245,12 @@ export function WiFiPasswordDisplay({
                   {copiedYesterday ? (
                     <>
                       <Check className="h-4 w-4 mr-2" />
-                      Copied Yesterday's!
+                      Copied Yesterday&apos;s!
                     </>
                   ) : (
                     <>
                       <Copy className="h-4 w-4 mr-2" />
-                      Copy Yesterday's Password
+                      Copy Yesterday&apos;s Password
                     </>
                   )}
                 </Button>
